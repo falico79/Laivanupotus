@@ -158,21 +158,13 @@ TODO Player
 
 
 */
+
 class Player {
-}
-
-/*
-TODO Game class
-
-
-
-*/
-class Game {
     private Grid grid;
     private String name;
     private Ship ships[];
 
-    Game(String name) {
+    Player(String name) {
         this.name = name;
 
         ships = new Ship[5];
@@ -185,12 +177,29 @@ class Game {
         grid = new Grid();
     }
 
+    public String getName() {
+        return name;
+    }
+
+}
+
+class Enemy {
+    private Grid grid;
+    private String name;
+
+    Enemy(String name) {
+        this.name = name;
+
+        grid = new Grid();
+    }
 }
 
 final class GameBoard extends View {
     int view_width, view_height;
+    Player player;
     public GameBoard( Context context) {
         super(context);
+        player = new Player("Lasse");
     }
 
     public void onSizeChanged(int current_width_of_this_view, int current_height_of_this_view, int old_width_of_this_view, int old_height_of_this_view) {
