@@ -5,27 +5,36 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+class Coordinate {
+    public int x, y;
 
+    public Coordinate(int _x, int _y) {
+        x = _x;
+        y = _y;
+    }
+}
 
 class Cell {
-    private enum Shot { notFired, hit, miss }
+
+    enum Shot { notFired, hit, miss }
     private Content content;
-    private Shot status;
+    public Shot status;
 
-    private int x, y;
+    private Coordinate position;
 
-    public Cell(int _x, int _y) {
+    public Cell(Coordinate pos) {
         status = Shot.notFired;
         content = new Content("water");
 
-        x = _x;
-        y = _y;
+        position = pos;
     }
     public void PlaceShip(Ship ship) {
         content = ship;
     }
 
-
+    public Content getContent() {
+        return content;
+    }
 
     public boolean HitIt() {
         if(content.getType().equals("water")) {
@@ -46,26 +55,58 @@ class Grid {
         cells = new Cell[10][10];
         for(int i = 0; i < 10; i++) {
             for(int j = 0; j < 10; j++) {
-                cells[i][j] = new Cell(i, j);
+                Coordinate coord = new Coordinate(i, j);
+
+
+                cells[i][j] = new Cell(coord);
             }
         }
     }
 
-    public boolean Place(Ship ship, int posx, int posy, int orientation) {
+    public boolean Place(Ship ship, Coordinate coord, String orientation) {
         if(ship.Placed()) {
             return false;
         }
-        return TestCellAndPlace(ship, posx, posy, orientation);
+
+        for(int attempt = 1; attempt <= 2; attempt++) {
+            Coordinate temp = new Coordinate(coord.x, coord.y);
+            for(int i = 0; i < ship.Length(); i++) {
+                temp = TestCellAndPlace(ship, temp, orientation, attempt);
+                if(temp==null) return false;
+            }
+        }
+        return true;
 
     }
     // TODO Ship Placement tests and placement
-    public boolean TestCellAndPlace(Ship ship, int posx, int posy, int orientation) {
-        return true;
+    private Coordinate TestCellAndPlace(Ship ship, Coordinate coord, String orientation, int attempt) {
+        if(coord.x >= 10 ||coord.y >= 10) return null;
+        if(attempt == 2) {
+            cells[coord.x][coord.y].PlaceShip(ship);
+        }
+        if(attempt == 1) {
+            if(!cells[coord.x][coord.y].getContent().equals("water")) {
+                return null;
+            }
+        }
+
+        if (orientation.equals("horizontal")) {
+            return new Coordinate(coord.x + 1, coord.y);
+        } else {
+            return new Coordinate(coord.x, coord.y + 1);
+        }
+
+    }
+
+    public void hit(Coordinate coord) {
+        if(cells[coord.x][coord.y].status == Cell.Shot.notFired) {
+            cells[coord.x][coord.y].HitIt();
+        }
     }
 }
 
 class Content {
-    protected String type;
+    private String type;
 
     public Content(String t) {
         type = t;
@@ -103,12 +144,47 @@ class Ship extends Content {
     public int Length() {
         return length;
     }
-    public boolean sunk() {
+    public boolean Sunk() {
         if(hit_count==length) {
             return true;
         }
         return false;
     }
+}
+
+/*
+TODO Player
+
+
+
+*/
+class Player {
+}
+
+/*
+TODO Game class
+
+
+
+*/
+class Game {
+    private Grid grid;
+    private String name;
+    private Ship ships[];
+
+    Game(String name) {
+        this.name = name;
+
+        ships = new Ship[5];
+        ships[0] = new Ship(5, "Lentotukialus");
+        ships[1] = new Ship(4, "Taistelulaiva");
+        ships[2] = new Ship(3, "Hävittäjä");
+        ships[3] = new Ship(3, "Sukellusvene");
+        ships[4] = new Ship(2, "Tiedustelualus");
+
+        grid = new Grid();
+    }
+
 }
 
 final class GameBoard extends View {
