@@ -180,6 +180,13 @@ class Player {
     public String getName() {
         return name;
     }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Grid getGrid() {
+        return grid;
+    }
 
 }
 
@@ -192,14 +199,20 @@ class Enemy {
 
         grid = new Grid();
     }
+    public Grid getGrid() {
+        return grid;
+    }
 }
 
 final class GameBoard extends View {
-    int view_width, view_height;
-    Player player;
-    public GameBoard( Context context) {
+    private int view_width;
+    private int view_height;
+    private Player player;
+    private Enemy enemy;
+    public GameBoard( Context context, String playerName, String enemyName) {
         super(context);
-        player = new Player("Lasse");
+        player = new Player(playerName);
+        enemy = new Enemy(enemyName);
     }
 
     public void onSizeChanged(int current_width_of_this_view, int current_height_of_this_view, int old_width_of_this_view, int old_height_of_this_view) {
